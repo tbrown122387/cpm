@@ -1,0 +1,109 @@
+#' correlated pseudo-marginal: generates functions that output a big vector
+#' 
+#' @param paramKernSamp function(theta) -> theta proposal
+#' @param paramKernEval function(oldTheta, newTheta) -> logDensity.
+#' @param logPriorEval function(theta) -> logDensity.
+#' @param logLikeApproxEval function(y, thetaProposal, uProposal) -> logApproxDensity.
+#' @param yData the observed data
+#' @param numU integer number of u samples
+#' @param numIters integer number of MCMC iterations
+#' @param rho correlation tuning parameter (-1,1)
+#' @return vector of theta samples
+#' @examples
+#' TODO
+makeCPMSampler <- function(paramKernSamp, logParamKernEval, 
+                           logPriorEval, logLikeApproxEval,
+                           yData, numU, numIters, rho){
+  # checks
+  stopifnot(typeof(paramKernSamp) == "closure")
+  stopifnot(typeof(logParamKernEval) == "closure")
+  stopifnot(typeof(logPriorEval) == "closure")
+  stopifnot(typeof(logLikeApproxEval) == "closure")
+  stopifnot(-1 < rho & rho < 1)
+  
+  # state
+  U <- rnorm(numU)
+  theta <- vector(mode = "numeric", length = 0L)
+  y <- yData
+  logLikeApprox <- logLikeApproxEval(y, theta, U)
+  logPrior <- logPriorEval(theta)
+  
+  # function to be returned
+  function(initParams){
+    theta <<- initParams
+    
+    thetaSamps <- vector(mode = "list", length = numIters)
+    for(i in 1:numIters){
+      if(i > 1){
+        thetaProposal <- paramKernSamp(thetaSamps[[i-1]])
+        uProposal <- rho * U + sqrt(1 - rho^2) * rnorm(numU)
+        propLogLikeEval <- logLikeApproxEval(y, thetaProposal, uProposal)
+        propLogPriorEval <- logPriorEval(thetaProposal)
+        logRatio <- propLogLikeEval
+                  + propLogPriorEval
+                  + logParamKernEval(thetaProposal, theta)
+                  - logLikeApprox
+                  - logPrior
+                  - logParamKernEval(theta, thetaProposal)
+        accept <- log(runif(1)) < logRatio
+        if(accept){
+          U <<- uProposal
+          theta <<- thetaProposal
+          logLikeApprox <<- propLogLikeEval
+          logPrior <<- propLogPriorEval
+        }
+      }else{
+        theta <<- initParams
+        logLikeApprox <<- logLikeApproxEval(y, theta, U)
+        logPrior <<- logPriorEval(theta)
+      }
+      thetaSamps[[i]] <- theta
+    }
+    thetaSamps
+  }  
+}
+
+# example 
+# y | x, theta ~ Normal(x, SSy)
+# x | theta ~ Normal(0, SSx)
+# theta = (log SSy, log SSx)
+# p(theta | y) propto p(y | theta)p(theta)
+# approx p(y | theta) with mean( p(y | xi, theta)  ) where xi ~ p(xi | theta)
+# theta[1] = log SS x
+# theta[2] = log SS y
+
+# real data
+realTheta1 <- log(.2)
+realTheta2 <- log(.3)
+realParams <- c(realTheta1, realTheta2)
+numObs <- 10
+realX <- rnorm(numObs, mean = 0, sd = exp(.5*realTheta1))
+realY <- rnorm(numObs, mean = realX, sd = exp(.5*realTheta2))
+
+# tuning params
+numImportanceSamps <- 10000
+numMCMCIters <- 10
+randomWalkScale <- .001
+
+sampler <- makeCPMSampler(
+  paramKernSamp = function(params){
+    return(params + rnorm(2)*randomWalkScale)
+  },
+  logParamKernEval = function(oldTheta, newTheta){
+    dnorm(newTheta[1], oldTheta[1], sd = randomWalkScale[1], log = TRUE) 
+    + dnorm(newTheta[2], oldTheta[2], sd = randomWalkScale[2], log = TRUE)
+  },
+  logPriorEval = function(theta){0},
+  logLikeApproxEval = function(y, thetaProposal, uProposal){
+    xSamps <- uProposal*exp(.5*thetaProposal[1])
+    logCondLikes <- sum(dnorm(y, xSamps, log = TRUE))
+    cat(logCondLikes, "\n")
+    m <- max(logCondLikes)
+    log(sum(exp(logCondLikes - m))) + m - log(length(y))
+  }, realY, numImportanceSamps, numMCMCIters, .99
+)
+res <- sampler(realParams)
+firstSamps <- sapply(res, `[[`, 1)
+mean(abs(diff(firstSamps)) > .01)
+plot.ts(firstSamps)
+
