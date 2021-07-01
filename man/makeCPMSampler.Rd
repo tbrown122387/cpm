@@ -19,6 +19,8 @@ makeCPMSampler(
 \arguments{
 \item{paramKernSamp}{function(theta) -> theta proposal}
 
+\item{logParamKernEval}{function(oldTheta, newTheta) -> logDensity.}
+
 \item{logPriorEval}{function(theta) -> logDensity.}
 
 \item{logLikeApproxEval}{function(y, thetaProposal, uProposal) -> logApproxDensity.}
@@ -32,8 +34,6 @@ makeCPMSampler(
 \item{rho}{correlation tuning parameter (-1,1)}
 
 \item{storeEvery}{increase this integer if you want to use thinning}
-
-\item{paramKernEval}{function(oldTheta, newTheta) -> logDensity.}
 }
 \value{
 vector of theta samples
@@ -48,12 +48,13 @@ realTheta1 <- .2 + .3
 realTheta2 <- .2
 realParams <- c(realTheta1, realTheta2)
 numObs <- 10
-realX <- rnorm(numObs, mean = 0, sd = sqrt(realxVar))
-realY <- rnorm(numObs, mean = realX, sd = sqrt(realyVar))
+realX <- rnorm(numObs, mean = 0, sd = sqrt(realTheta2))
+realY <- rnorm(numObs, mean = realX, sd = sqrt(realTheta1 - realTheta2))
 # tuning params
 numImportanceSamps <- 1000
 numMCMCIters <- 1000
 randomWalkScale <- 1.5
+recordEveryTh <- 1
 myLLApproxEval <- 
   sampler <- makeCPMSampler(
     paramKernSamp = function(params){
@@ -78,7 +79,7 @@ myLLApproxEval <-
                                  sum(dnorm(y,
                                            xsamp,
                                            sqrt(thetaProposal[1] - thetaProposal[2]),
-                                           log = T)) })
+                                           log = TRUE)) })
         m <- max(logCondLikes)
         log(sum(exp(logCondLikes - m))) + m - log(length(y))
       }else{

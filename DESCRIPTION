@@ -1,10 +1,10 @@
-Package: cpmSkeleton
+Package: cpm
 Type: Package
 Title: Constructs a Correlated Pseudo-Marginal Sampler
 Version: 1.0
 Date: 2021-07-01
 Author: Taylor R. Brown
 Maintainer: Who to complain to <trb5me@virginia.edu>
-Description: More about what it does (maybe more than one line)
-License: The MIT License
+Description: The primary function generates a sampler function. This sampler function is constructed with the user's choice of prior, proposal distribution, and the likelihood approximation scheme. 
+License: MIT + file LICENSE
 RoxygenNote: 7.1.1

@@ -1,7 +1,8 @@
-#' checks if a log-density evaluation is NA or NaN
+#' checks if a log-density evaluation is not a valid number
 #' 
 #' @param num evaluation of a log-density
 #' @return TRUE or FALSE
+#' @export
 #' @examples
 #' isBadNum(NaN)
 isBadNum <- function(num){
@@ -12,7 +13,7 @@ isBadNum <- function(num){
 #' correlated pseudo-marginal: generates functions that output a big vector
 #' 
 #' @param paramKernSamp function(theta) -> theta proposal
-#' @param paramKernEval function(oldTheta, newTheta) -> logDensity.
+#' @param logParamKernEval function(oldTheta, newTheta) -> logDensity.
 #' @param logPriorEval function(theta) -> logDensity.
 #' @param logLikeApproxEval function(y, thetaProposal, uProposal) -> logApproxDensity.
 #' @param yData the observed data
@@ -21,6 +22,7 @@ isBadNum <- function(num){
 #' @param rho correlation tuning parameter (-1,1)
 #' @param storeEvery increase this integer if you want to use thinning
 #' @return vector of theta samples
+#' @export
 #' @examples
 #' 
 #' # sim data
@@ -28,12 +30,13 @@ isBadNum <- function(num){
 #' realTheta2 <- .2
 #' realParams <- c(realTheta1, realTheta2)
 #' numObs <- 10
-#' realX <- rnorm(numObs, mean = 0, sd = sqrt(realxVar))
-#' realY <- rnorm(numObs, mean = realX, sd = sqrt(realyVar))
+#' realX <- rnorm(numObs, mean = 0, sd = sqrt(realTheta2))
+#' realY <- rnorm(numObs, mean = realX, sd = sqrt(realTheta1 - realTheta2))
 #' # tuning params
 #' numImportanceSamps <- 1000
 #' numMCMCIters <- 1000
 #' randomWalkScale <- 1.5
+#' recordEveryTh <- 1
 #' myLLApproxEval <- 
 #'   sampler <- makeCPMSampler(
 #'     paramKernSamp = function(params){
@@ -58,7 +61,7 @@ isBadNum <- function(num){
 #'                                  sum(dnorm(y,
 #'                                            xsamp,
 #'                                            sqrt(thetaProposal[1] - thetaProposal[2]),
-#'                                            log = T)) })
+#'                                            log = TRUE)) })
 #'         m <- max(logCondLikes)
 #'         log(sum(exp(logCondLikes - m))) + m - log(length(y))
 #'       }else{
@@ -144,9 +147,9 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
 #' calculates the posterior mean point estimate
 #' 
 #' @param x a cpmResults object
+#' @param ... arguments to be passed to or from methods.
 #' @return a vector of parameter estimates (posterior mean)
-#' @examples
-#' TODO
+#' @export
 mean.cpmResults <- function(x, ...){
   colMeans(do.call(rbind, x$samples))
 }
@@ -155,9 +158,9 @@ mean.cpmResults <- function(x, ...){
 #' prints a cpmResults object
 #' 
 #' @param x a cpmResults object
+#' @param ... arguments to be passed to or from methods.
 #' @return the same cpmResults object
-#' @examples
-#' TODO
+#' @export
 print.cpmResults <- function(x, ...){
   cat(
     "CPM Results: at a glance...\n",
@@ -171,8 +174,8 @@ print.cpmResults <- function(x, ...){
 #' plots a cpmResults object
 #' 
 #' @param x a cpmResults object
-#' @examples
-#' TODO
+#' @param ... arguments to be passed to or from methods.
+#' @export
 plot.cpmResults <- function(x, ...){
   graphics::pairs(do.call(rbind, x$samples), 
         labels = paste0("theta", 1:length(x$samples[[1]])))

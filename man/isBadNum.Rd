@@ -2,7 +2,7 @@
 % Please edit documentation in R/cpm.R
 \name{isBadNum}
 \alias{isBadNum}
-\title{checks if a log-density evaluation is NA or NaN}
+\title{checks if a log-density evaluation is not a valid number}
 \usage{
 isBadNum(num)
 }
@@ -13,7 +13,7 @@ isBadNum(num)
 TRUE or FALSE
 }
 \description{
-checks if a log-density evaluation is NA or NaN
+checks if a log-density evaluation is not a valid number
 }
 \examples{
 isBadNum(NaN)
