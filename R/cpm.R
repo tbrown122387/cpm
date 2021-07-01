@@ -134,7 +134,7 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
         thetaSamps[[thisIndex]] <- theta
     }
     
-    stuff <- list(samples = thetaSamps, acceptRate = numAccepts / numIters)
+    stuff <- list(samples = thetaSamps, numAccepts = numAccepts, numIters = numIters)
     class(stuff) <- "cpmResults"
     stuff
   }  
@@ -151,13 +151,30 @@ mean.cpmResults <- function(x, ...){
   colMeans(do.call(rbind, x$samples))
 }
 
+
 #' prints a cpmResults object
 #' 
-#' @param num evaluation of a log-density
-#' @return TRUE or FALSE
+#' @param x a cpmResults object
+#' @return the same cpmResults object
 #' @examples
 #' TODO
 print.cpmResults <- function(x, ...){
-  print.default("posterior means (in the supplied parameterization): ", mean(x))
-  print.default("acceptance rate: ", x$acceptRate)
+  cat(
+    "CPM Results: at a glance...\n",
+    x$numIters, " iterations performed\n",
+    length(x$samples), " samples retained\n",
+    "posterior means (in the supplied parameterization): ", mean(x), "\n",
+    "acceptance rate: ", x$numAccepts / x$numIters)
+  invisible(x)
 }
+
+#' plots a cpmResults object
+#' 
+#' @param x a cpmResults object
+#' @examples
+#' TODO
+plot.cpmResults <- function(x, ...){
+  pairs(do.call(rbind, x$samples), 
+        labels = paste0("theta", 1:length(x$samples[[1]])))
+}
+

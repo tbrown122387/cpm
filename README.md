@@ -68,7 +68,10 @@ sampler <- makeCPMSampler(
   realY, numImportanceSamps, numMCMCIters, .99, recordEveryTh
 )
 res <- sampler(realParams)
+
+# look at output
 print(res)
+plot(res)
 ```
 
 
