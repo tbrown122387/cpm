@@ -1,4 +1,4 @@
-# cpm
+# cPseudoMaRg
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/tbrown122387/cpm/workflows/R-CMD-check/badge.svg)](https://github.com/tbrown122387/cpm/actions)

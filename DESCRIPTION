@@ -1,7 +1,7 @@
-Package: cpm
+Package: cPseudoMaRg
 Type: Package
 Title: Constructs a Correlated Pseudo-Marginal Sampler
-Version: 1.0
+Version: 1.0.0
 Date: 2021-07-01
 Author: Taylor R. Brown
 Maintainer: Who to complain to <trb5me@virginia.edu>
