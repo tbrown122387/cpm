@@ -80,7 +80,7 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
   stopifnot(-1 < rho & rho < 1)
   
   # state
-  U <- rnorm(numU)
+  U <- stats::rnorm(numU)
   theta <- vector(mode = "numeric", length = 0L)
   y <- yData
   logLikeApprox <- -Inf # set later
@@ -100,7 +100,7 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
       if(i > 1){
         
         thetaProposal <- paramKernSamp(thetaSamps[[prevIndex]])
-        uProposal <- rho * U + sqrt(1 - rho^2) * rnorm(numU)
+        uProposal <- rho * U + sqrt(1 - rho^2) * stats::rnorm(numU)
         
         # hastings ratio
         propLogLikeEval <- logLikeApproxEval(y, thetaProposal, uProposal)
@@ -116,7 +116,7 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
                   + propLogPriorEval - logPrior
                   + backwardLogKern - forwardLogKern
         
-        accept <- log(runif(1)) < logRatio
+        accept <- log(stats::runif(1)) < logRatio
         if(accept){
           U <<- uProposal
           theta <<- thetaProposal
@@ -174,7 +174,7 @@ print.cpmResults <- function(x, ...){
 #' @examples
 #' TODO
 plot.cpmResults <- function(x, ...){
-  pairs(do.call(rbind, x$samples), 
+  graphics::pairs(do.call(rbind, x$samples), 
         labels = paste0("theta", 1:length(x$samples[[1]])))
 }
 

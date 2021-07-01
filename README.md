@@ -1,5 +1,9 @@
 # cpm
 
+<!-- badges: start -->
+  [![R-CMD-check](https://github.com/tbrown122387/cpm/workflows/R-CMD-check/badge.svg)](https://github.com/tbrown122387/cpm/actions)
+  <!-- badges: end -->
+
 An implementation of the [Correlated Pseudo-Marginal Sampler](https://arxiv.org/abs/1511.04992).
 
 ## Install
