@@ -140,77 +140,24 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
   }  
 }
 
-# # example 
-# # y | x, theta ~ Normal(x, SSy)
-# # x | theta ~ Normal(0, SSx)
-# # theta = (SSy + SSx, SS_x)
-# # p(theta | y) propto p(y | theta)p(theta)
-# # approx p(y | theta) with mean( p(y | xi, theta)  ) where xi ~ p(xi | theta)
-# 
-# # real data
-# realxVar <- .2
-# realyVar <- .3
-# realTheta1 <- realxVar + realyVar
-# realTheta2 <- realxVar
-# realParams <- c(realTheta1, realTheta2)
-# numObs <- 10
-# realX <- rnorm(numObs, mean = 0, sd = sqrt(realxVar))
-# realY <- rnorm(numObs, mean = realX, sd = sqrt(realyVar))
-# 
-# # tuning params
-# numImportanceSamps <- 1000
-# numMCMCIters <- 10000
-# randomWalkScale <- 1.5
-# recordEveryTh <- 1
-# myLLApproxEval <- function(y, thetaProposal, uProposal){
-#   if( (thetaProposal[1] > thetaProposal[2]) & (all(thetaProposal > 0))){
-#     xSamps <- uProposal*sqrt(thetaProposal[2])
-#     logCondLikes <- sapply(xSamps,
-#                            function(xsamp) {
-#                              sum(dnorm(y,
-#                                        xsamp,
-#                                        sqrt(thetaProposal[1] - thetaProposal[2]),
-#                                        log = T)) })
-#     m <- max(logCondLikes)
-#     log(sum(exp(logCondLikes - m))) + m - log(length(y))
-#   }else{
-#     -Inf
-#   }
-# }
-# myLLRealEval <- function(y, thetaProposal, uProposal){
-#   if( (thetaProposal[1] > thetaProposal[2]) & (all(thetaProposal > 0))){
-#     sum(dnorm(y,
-#               mean = 0,
-#               sd = sqrt(thetaProposal[1]),
-#               log = T))
-#   }else{
-#     -Inf
-#   }
-# }
-# sampler <- makeCPMSampler(
-#   paramKernSamp = function(params){
-#     return(params + rnorm(2)*randomWalkScale)
-#   },
-#   logParamKernEval = function(oldTheta, newTheta){
-#     dnorm(newTheta[1], oldTheta[1], sd = randomWalkScale, log = TRUE) 
-#          + dnorm(newTheta[2], oldTheta[2], sd = randomWalkScale, log = TRUE)
-#   },
-#   logPriorEval = function(theta){
-#     if( (theta[1] > theta[2]) & all(theta > 0)){
-#       0
-#     }else{
-#       -Inf
-#     }
-#   }, 
-#   logLikeApproxEval = myLLApproxEval, 
-#   realY, numImportanceSamps, numMCMCIters, .99, recordEveryTh
-# )
-# res <- sampler(realParams)
-# firstSamps <- sapply(res$samples, `[[`, 1)
-# secondSamps <- sapply(res$samples, `[[`, 2)
-# pairs(cbind(firstSamps - secondSamps, secondSamps))
-# plot(firstSamps, secondSamps, type = "l")
-# cat("acceptance rate: ", res$acceptRate)
-# #plot.ts(firstSamps)
-# #abline(h = realTheta1)
-# 
+
+#' calculates the posterior mean point estimate
+#' 
+#' @param x a cpmResults object
+#' @return a vector of parameter estimates (posterior mean)
+#' @examples
+#' TODO
+mean.cpmResults <- function(x, ...){
+  colMeans(do.call(rbind, x$samples))
+}
+
+#' prints a cpmResults object
+#' 
+#' @param num evaluation of a log-density
+#' @return TRUE or FALSE
+#' @examples
+#' TODO
+print.cpmResults <- function(x, ...){
+  print.default("posterior means (in the supplied parameterization): ", mean(x))
+  print.default("acceptance rate: ", x$acceptRate)
+}

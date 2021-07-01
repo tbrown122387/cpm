@@ -68,13 +68,7 @@ sampler <- makeCPMSampler(
   realY, numImportanceSamps, numMCMCIters, .99, recordEveryTh
 )
 res <- sampler(realParams)
-firstSamps <- sapply(res$samples, `[[`, 1)
-secondSamps <- sapply(res$samples, `[[`, 2)
-pairs(cbind(firstSamps - secondSamps, secondSamps))
-plot(firstSamps, secondSamps, type = "l")
-cat("acceptance rate: ", res$acceptRate)
-#plot.ts(firstSamps)
-#abline(h = realTheta1)
+print(res)
 ```
 
 
