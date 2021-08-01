@@ -8,6 +8,14 @@ An implementation of the [Correlated Pseudo-Marginal Sampler](https://arxiv.org/
 
 ## Install
 
+Install from CRAN by typing 
+
+```
+install.packages("cPseudoMaRg")
+```
+
+in an R console. Alternatively, install from Github by typing 
+
 ```
 devtools::install_github("tbrown122387/cpm")
 ```
