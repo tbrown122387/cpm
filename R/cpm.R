@@ -21,6 +21,7 @@ isBadNum <- function(num){
 #' @param numIters integer number of MCMC iterations
 #' @param rho correlation tuning parameter (-1,1)
 #' @param storeEvery increase this integer if you want to use thinning
+#' @param nansInLLFatal terminate the entire chain on NaNs, or simply disregard sample
 #' @return vector of theta samples
 #' @export
 #' @examples
@@ -73,7 +74,7 @@ isBadNum <- function(num){
 makeCPMSampler <- function(paramKernSamp, logParamKernEval, 
                            logPriorEval, logLikeApproxEval,
                            yData, numU, numIters, 
-                           rho = .99, storeEvery = 1){
+                           rho = .99, storeEvery = 1, nansInLLFatal = TRUE){
   # checks
   stopifnot(typeof(paramKernSamp) == "closure")
   stopifnot(typeof(logParamKernEval) == "closure")
@@ -109,10 +110,15 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
         propLogPriorEval <- logPriorEval(thetaProposal)
         forwardLogKern <- logParamKernEval(thetaProposal, theta)
         backwardLogKern <- logParamKernEval(theta, thetaProposal)
-        stopifnot(!isBadNum(propLogLikeEval))
+        
         stopifnot(!isBadNum(propLogPriorEval))
         stopifnot(!isBadNum(forwardLogKern))
         stopifnot(!isBadNum(backwardLogKern))
+        if(nansInLLFatal)
+          stopifnot(!isBadNum(propLogLikeEval))
+        else if( isBadNum(propLogLikeEval) ){
+          propLogLikeEval <- -Inf
+        }
         
         logRatio <- propLogLikeEval - logLikeApprox
                   + propLogPriorEval - logPrior
@@ -126,8 +132,10 @@ makeCPMSampler <- function(paramKernSamp, logParamKernEval,
           logPrior <<- propLogPriorEval
           numAccepts <- numAccepts + 1
         }
-      }else{ 
+      }else{ # i == 1
         logLikeApprox <<- logLikeApproxEval(y, theta, U)
+        if(isBadNum(logLikeApprox))
+          stop("starting parameter is invalid")
         logPrior <<- logPriorEval(theta)
       }
       

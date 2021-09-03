@@ -55,38 +55,37 @@ numImportanceSamps <- 1000
 numMCMCIters <- 1000
 randomWalkScale <- 1.5
 recordEveryTh <- 1
-myLLApproxEval <- 
-  sampler <- makeCPMSampler(
-    paramKernSamp = function(params){
-      return(params + rnorm(2)*randomWalkScale)
-    },
-    logParamKernEval = function(oldTheta, newTheta){
-      dnorm(newTheta[1], oldTheta[1], sd = randomWalkScale, log = TRUE)
-      + dnorm(newTheta[2], oldTheta[2], sd = randomWalkScale, log = TRUE)
-    },
-    logPriorEval = function(theta){
-      if( (theta[1] > theta[2]) & all(theta > 0)){
-        0
-      }else{
-        -Inf
-      }
-    },
-    logLikeApproxEval = function(y, thetaProposal, uProposal){
-      if( (thetaProposal[1] > thetaProposal[2]) & (all(thetaProposal > 0))){
-        xSamps <- uProposal*sqrt(thetaProposal[2])
-        logCondLikes <- sapply(xSamps,
-                               function(xsamp) {
-                                 sum(dnorm(y,
-                                           xsamp,
-                                           sqrt(thetaProposal[1] - thetaProposal[2]),
-                                           log = TRUE)) })
-        m <- max(logCondLikes)
-        log(sum(exp(logCondLikes - m))) + m - log(length(y))
-      }else{
-        -Inf
-      }
-    },
-    realY, numImportanceSamps, numMCMCIters, .99, recordEveryTh
-  )
+sampler <- makeCPMSampler(
+ paramKernSamp = function(params){
+   return(params + rnorm(2)*randomWalkScale)
+ },
+ logParamKernEval = function(oldTheta, newTheta){
+   dnorm(newTheta[1], oldTheta[1], sd = randomWalkScale, log = TRUE)
+   + dnorm(newTheta[2], oldTheta[2], sd = randomWalkScale, log = TRUE)
+ },
+ logPriorEval = function(theta){
+   if( (theta[1] > theta[2]) & all(theta > 0)){
+     0
+   }else{
+     -Inf
+   }
+ },
+ logLikeApproxEval = function(y, thetaProposal, uProposal){
+   if( (thetaProposal[1] > thetaProposal[2]) & (all(thetaProposal > 0))){
+     xSamps <- uProposal*sqrt(thetaProposal[2])
+     logCondLikes <- sapply(xSamps,
+                           function(xsamp) {
+                             sum(dnorm(y,
+                                       xsamp,
+                                       sqrt(thetaProposal[1] - thetaProposal[2]),
+                                       log = TRUE)) })
+     m <- max(logCondLikes)
+     log(sum(exp(logCondLikes - m))) + m - log(length(y))
+   }else{
+     -Inf
+   }
+ },
+ realY, numImportanceSamps, numMCMCIters, .99, recordEveryTh
+)
 res <- sampler(realParams)
 }
