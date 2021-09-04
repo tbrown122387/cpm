@@ -13,7 +13,8 @@ makeCPMSampler(
   numU,
   numIters,
   rho = 0.99,
-  storeEvery = 1
+  storeEvery = 1,
+  nansInLLFatal = TRUE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ makeCPMSampler(
 \item{rho}{correlation tuning parameter (-1,1)}
 
 \item{storeEvery}{increase this integer if you want to use thinning}
+
+\item{nansInLLFatal}{terminate the entire chain on NaNs, or simply disregard sample}
 }
 \value{
 vector of theta samples
