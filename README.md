@@ -2,7 +2,6 @@
 
 <!-- badges: start -->
   
-[![R-CMD-check](https://github.com/tbrown122387/cpm/workflows/R-CMD-check/badge.svg)](https://github.com/tbrown122387/cpm/actions)
 
 [![DOI](https://zenodo.org/badge/381811804.svg)](https://zenodo.org/badge/latestdoi/381811804)
 [![R-CMD-check](https://github.com/tbrown122387/cpm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tbrown122387/cpm/actions/workflows/R-CMD-check.yaml)
