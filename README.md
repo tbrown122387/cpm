@@ -1,14 +1,12 @@
 # cPseudoMaRg
 
 <!-- badges: start -->
-  [![R-CMD-check](https://github.com/tbrown122387/cpm/workflows/R-CMD-check/badge.svg)](https://github.com/tbrown122387/cpm/actions)
-
-
+  
+[![R-CMD-check](https://github.com/tbrown122387/cpm/workflows/R-CMD-check/badge.svg)](https://github.com/tbrown122387/cpm/actions)
 
 [![DOI](https://zenodo.org/badge/381811804.svg)](https://zenodo.org/badge/latestdoi/381811804)
-
-
-  <!-- badges: end -->
+[![R-CMD-check](https://github.com/tbrown122387/cpm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tbrown122387/cpm/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
 
 An implementation of the [Correlated Pseudo-Marginal Sampler](https://arxiv.org/abs/1511.04992).
 
